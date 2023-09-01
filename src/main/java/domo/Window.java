@@ -4,6 +4,7 @@ import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
+import util.Time;
 
 import java.nio.*;
 import static org.lwjgl.glfw.Callbacks.*;
@@ -13,16 +14,22 @@ import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
+    //--------------------- Params ---------------------
     private int width;
     private int height;
     private String title;
     private long glfwWindow;
 
-    private float r, g, b, a;
+    public float r, g, b, a;
     private boolean fadeToBlack = false;
 
     // only one instance of window:
     private static Window window;
+
+    // setting up current scene variable, as Scene type.
+    private static Scene currentScene = null;
+    //--------------------------------------------------
+
 
     /* creates only onw Window class with this constructor:
      * Initially set to standard HD definition 1920x1080
@@ -36,6 +43,22 @@ public class Window {
         g=1;
         b=1;
         a=1;
+    }
+
+    public static void changeScene(int newSceneIndex) {
+        switch (newSceneIndex) {
+            case 0:
+                currentScene = new LevelEditorScene();
+//              currentScene.init();
+                break;
+            case 1:
+                currentScene = new LevelScene();
+//                currentScene.init();
+                break;
+            default:
+                assert false : "Unknown scene with index : " + newSceneIndex;
+                break;
+        }
     }
 
     public static Window get() {
@@ -114,9 +137,16 @@ public class Window {
         // bindings available for use.
         GL.createCapabilities();
 
+        Window.changeScene(0);
     }
 
     public void loop () {
+        // time when frame started
+        float beginTime = Time.getTime();
+        // time when frame ended
+        float endTime; // = Time.getTime();
+        float dt = -1.0f;
+
         while (!glfwWindowShouldClose(glfwWindow)) {
             // Poll events, key events, mouse events:
             glfwPollEvents();
@@ -125,18 +155,30 @@ public class Window {
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // fade to black when space bar is pressed
-            if (KeyListener.isKeyPressed(GLFW_KEY_SPACE)) {
-                fadeToBlack = true;
+            // update color only when time passes. not initially. lag of 2 frames.
+            if (dt >= 0) {
+                currentScene.update(dt);
             }
 
-            if(fadeToBlack) {
-                r= Math.max(r- 0.01f, 0);
-                g= Math.max(r- 0.01f, 0);
-                b= Math.max(r- 0.01f, 0);
-            }
+//            // fade to black when space bar is pressed
+//            if (KeyListener.isKeyPressed(GLFW_KEY_SPACE)) {
+//                fadeToBlack = true;
+//            }
+//
+//            if(fadeToBlack) {
+//                r= Math.max(r- 0.01f, 0);
+//                g= Math.max(r- 0.01f, 0);
+//                b= Math.max(r- 0.01f, 0);
+//            }
 
             glfwSwapBuffers(glfwWindow);
+
+            // endTime gets the time that is right now after all operations in loop are already completed
+            // dt is delta time of that time passed
+            // beginTime is current time after operation is finished.
+            endTime = Time.getTime();
+            dt = endTime - beginTime;
+            beginTime = endTime;
         }
     }
 }
