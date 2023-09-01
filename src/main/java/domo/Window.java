@@ -18,6 +18,9 @@ public class Window {
     private String title;
     private long glfwWindow;
 
+    private float r, g, b, a;
+    private boolean fadeToBlack = false;
+
     // only one instance of window:
     private static Window window;
 
@@ -28,6 +31,11 @@ public class Window {
         this.width = 1920;
         this.height = 1080;
         this.title = "Platformer";
+
+        r=1;
+        g=1;
+        b=1;
+        a=1;
     }
 
     public static Window get() {
@@ -41,6 +49,14 @@ public class Window {
         System.out.println("Konichiwa! LWJGL version: " + Version.getVersion() + "!" );
         init();
         loop();
+
+        // Free the momory once loop has exit:
+        glfwFreeCallbacks(glfwWindow);
+        glfwDestroyWindow(glfwWindow);
+
+        // Terminate GLFW and then free the error callback
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
     }
 
     public void init() {
@@ -71,6 +87,15 @@ public class Window {
             throw new RuntimeException("Failed to create the GLFW Window");
         }
 
+        // :: shortcut for lambda function x->(x)
+        // mouse listeners from MouseListener helper
+        glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
+        glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
+        glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
+
+        // Keyboard key buttons clicked listeners from KeyListener:
+        glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
+
         // Make the OpenGL context current:
         glfwMakeContextCurrent(glfwWindow);
 
@@ -92,21 +117,24 @@ public class Window {
     }
 
     public void loop () {
-//        // This line is critical for LWJGL's interoperation with GLFW's
-//        // OpenGL context, or any context that is managed externally.
-//        // LWJGL detects the context that is current in the current thread,
-//        // creates the GLCapabilities instance and makes the OpenGL
-//        // bindings available for use.
-//        GL.createCapabilities();
-
-        // colors represent R G B + alpha
-        glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-
         while (!glfwWindowShouldClose(glfwWindow)) {
             // Poll events, key events, mouse events:
             glfwPollEvents();
 
+            // colors represent R G B + alpha
+            glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            // fade to black when space bar is pressed
+            if (KeyListener.isKeyPressed(GLFW_KEY_SPACE)) {
+                fadeToBlack = true;
+            }
+
+            if(fadeToBlack) {
+                r= Math.max(r- 0.01f, 0);
+                g= Math.max(r- 0.01f, 0);
+                b= Math.max(r- 0.01f, 0);
+            }
 
             glfwSwapBuffers(glfwWindow);
         }
