@@ -45,15 +45,20 @@ public class Window {
         a=1;
     }
 
+    /*
+    * changes scene accordingly to passed scene number
+    * every scene is initialized before its run
+    * there is no default scene
+    * */
     public static void changeScene(int newSceneIndex) {
         switch (newSceneIndex) {
             case 0:
                 currentScene = new LevelEditorScene();
-//              currentScene.init();
+                currentScene.init();
                 break;
             case 1:
                 currentScene = new LevelScene();
-//                currentScene.init();
+                currentScene.init();
                 break;
             default:
                 assert false : "Unknown scene with index : " + newSceneIndex;
@@ -69,7 +74,7 @@ public class Window {
     }
 
     public void run() {
-        System.out.println("Konichiwa! LWJGL version: " + Version.getVersion() + "!" );
+        System.out.println("Konichiwa! LWJGL version: " + Version.getVersion() + "!" + " GL version: " + GLFW_VERSION_MAJOR + GLFW_VERSION_MINOR + GLFW_VERSION_REVISION );
         init();
         loop();
 
@@ -93,13 +98,18 @@ public class Window {
             throw new IllegalStateException("Unable to initialize GLFW.");
         }
 
-        /* Configure GLFW
-         * defines if windows should be visible, etc..
+        /* ------------------------------------------------- IMPORTANT before creating window.
+         * create hints for version 410 core on M1 mac.
+         * on some machines might need to set version to 320 and use forward compat , and core profile
+         * version in glsl file might need to be as '#version 320 es' or '#version 320 core' or '#version 420'
+         *
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
          */
-        glfwDefaultWindowHints();
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
         /* Create the window,
          * returns a long number, which a place in memory where this window is stored.
@@ -122,7 +132,7 @@ public class Window {
         // Make the OpenGL context current:
         glfwMakeContextCurrent(glfwWindow);
 
-        // enable v-sync. swap every single frame.
+        // enable v-sync. swap every single frame. Creates uniform Framerate depending on your monitor.
         glfwSwapInterval(1);
 
         // Make the window visible
@@ -136,6 +146,14 @@ public class Window {
         // creates the GLCapabilities instance and makes the OpenGL
         // bindings available for use.
         GL.createCapabilities();
+
+        /* Configure GLFW
+         * defines if windows should be visible, etc..
+         */
+        glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
         Window.changeScene(0);
     }
@@ -160,22 +178,13 @@ public class Window {
                 currentScene.update(dt);
             }
 
-//            // fade to black when space bar is pressed
-//            if (KeyListener.isKeyPressed(GLFW_KEY_SPACE)) {
-//                fadeToBlack = true;
-//            }
-//
-//            if(fadeToBlack) {
-//                r= Math.max(r- 0.01f, 0);
-//                g= Math.max(r- 0.01f, 0);
-//                b= Math.max(r- 0.01f, 0);
-//            }
-
             glfwSwapBuffers(glfwWindow);
 
-            // endTime gets the time that is right now after all operations in loop are already completed
-            // dt is delta time of that time passed
-            // beginTime is current time after operation is finished.
+            /*
+             * endTime gets the time that is right now after all operations in loop are already completed
+             * dt is delta time of that time passed
+             * beginTime is current time after operation is finished.
+             */
             endTime = Time.getTime();
             dt = endTime - beginTime;
             beginTime = endTime;
