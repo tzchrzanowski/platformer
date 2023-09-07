@@ -1,5 +1,6 @@
 package domo;
 
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import renderer.Shader;
 
@@ -18,9 +19,9 @@ public class LevelEditorScene extends Scene {
     /* position, color, */
     private float[] vertexArray = {
         // position             // color
-         0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f, 1.0f, // bottom right | index --> 0
-        -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f, 1.0f, // top left     | index --> 1
-         0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f, 1.0f, // top right    | index --> 2
+         100.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f, 1.0f, // bottom right | index --> 0
+        -0.5f,  100.5f, 0.0f,     0.0f, 1.0f, 0.0f, 1.0f, // top left     | index --> 1
+         100.5f,  100.5f, 0.0f,     0.0f, 0.0f, 1.0f, 1.0f, // top right    | index --> 2
         -0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 0.0f, 1.0f, // bottom left  | index --> 3
     };
     /* list of elements to be displayed
@@ -50,6 +51,11 @@ public class LevelEditorScene extends Scene {
     * */
     @Override
     public void init() {
+        /*
+        * Create new camera:
+        * */
+        this.camera = new Camera(new Vector2f());
+
         /*
         * Get shader first from file
         * */
@@ -110,8 +116,16 @@ public class LevelEditorScene extends Scene {
     * */
     @Override
     public void update(float dt) {
+        // move camera a bit to the side one step at a time. 
+        camera.position.x -= dt * 50.0f;
+
         // bind shader program
         defaultShader.use();
+
+        // before we bind everything, we upload ..
+        defaultShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
+        defaultShader.uploadMat4f("uView", camera.getViewMatrix());
+
         // bind the VAO vertex that we are using,
         glBindVertexArray(vaoID);
 

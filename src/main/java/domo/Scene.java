@@ -1,6 +1,8 @@
 package domo;
 
 public abstract class Scene {
+    protected Camera camera;
+
     /*
     * game object, physics, everything goes here
     * */
