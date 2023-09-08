@@ -3,6 +3,7 @@ package domo;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import renderer.Shader;
+import util.Time;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -118,6 +119,7 @@ public class LevelEditorScene extends Scene {
     public void update(float dt) {
         // move camera a bit to the side one step at a time. 
         camera.position.x -= dt * 50.0f;
+        camera.position.y -= dt * 20.0f;
 
         // bind shader program
         defaultShader.use();
@@ -125,6 +127,7 @@ public class LevelEditorScene extends Scene {
         // before we bind everything, we upload ..
         defaultShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
         defaultShader.uploadMat4f("uView", camera.getViewMatrix());
+        defaultShader.uploadFloat("uTime", Time.getTime()); // passing time to it, we will do time-based animations in shader using this.
 
         // bind the VAO vertex that we are using,
         glBindVertexArray(vaoID);
@@ -138,7 +141,7 @@ public class LevelEditorScene extends Scene {
         // now unbind everything
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
-
+                                       
         glBindVertexArray(0);
         defaultShader.detach();
     }

@@ -16,6 +16,10 @@ public class Camera {
         adjustProjection();
     }
 
+    public Vector2f getPosition() {
+        return this.position;
+    }
+
     /*
      * screen size is defined here:
      * operates on units, not pixels

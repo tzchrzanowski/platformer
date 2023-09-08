@@ -1,6 +1,8 @@
 package renderer;
 
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
 import java.io.IOException;
@@ -14,6 +16,7 @@ import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
 
 public class Shader {
     private int shaderProgramID;
+    private boolean beingUsed = false; // is shader being used?
     private String vertexSource;
     private String fragmentSource;
     private String filepath;
@@ -130,12 +133,16 @@ public class Shader {
     }
 
     public void use() {
-        // bind shader program
-        glUseProgram(shaderProgramID);
+        if (!beingUsed) {
+            // bind shader program
+            glUseProgram(shaderProgramID);
+            beingUsed = true;
+        }
     }
 
     public void detach() {
         glUseProgram(0);
+        beingUsed = false;
     }
 
     /*
@@ -143,8 +150,48 @@ public class Shader {
     * */
     public void uploadMat4f(String varName, Matrix4f mat4) {
         int varLocation = glGetUniformLocation(shaderProgramID, varName);
+        use(); // local use, to use shader.
         FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16); // 4x4 matrix
         mat4.get(matBuffer);
         glUniformMatrix4fv(varLocation, false, matBuffer);
+    }
+
+    public void uploadMat3f(String varName, Matrix3f mat3) {
+        int varLocation = glGetUniformLocation(shaderProgramID, varName);
+        use(); // local use, to use shader.
+        FloatBuffer matBuffer = BufferUtils.createFloatBuffer(9); // 4x4 matrix
+        mat3.get(matBuffer);
+        glUniformMatrix3fv(varLocation, false, matBuffer);
+    }
+
+
+    public void uploadVec4f(String varName, Vector4f vec) {
+        int varLocation = glGetUniformLocation(shaderProgramID, varName);
+        use(); // make usre to use local shader
+        glUniform4f(varLocation, vec.x, vec.y, vec.z, vec.w);
+    }
+
+    public void uploadVec3f(String varName, Vector4f vec) {
+        int varLocation = glGetUniformLocation(shaderProgramID, varName);
+        use(); // make usre to use local shader
+        glUniform3f(varLocation, vec.x, vec.y, vec.z);
+    }
+
+    public void uploadVec2f(String varName, Vector4f vec) {
+        int varLocation = glGetUniformLocation(shaderProgramID, varName);
+        use(); // make usre to use local shader
+        glUniform2f(varLocation, vec.x, vec.y);
+    }
+
+    public void uploadFloat(String varName, float val) {
+        int varLocation = glGetUniformLocation(shaderProgramID, varName);
+        use();
+        glUniform1f(varLocation, val);
+    }
+
+    public void uploadInt(String varName, int val) {
+        int varLocation = glGetUniformLocation(shaderProgramID, varName);
+        use();
+        glUniform1i(varLocation, val);
     }
 }
