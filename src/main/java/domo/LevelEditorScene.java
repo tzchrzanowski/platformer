@@ -3,6 +3,7 @@ package domo;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import renderer.Shader;
+import renderer.Texture;
 import util.Time;
 
 import java.nio.FloatBuffer;
@@ -15,15 +16,16 @@ public class LevelEditorScene extends Scene {
     // --------------------------Params definition: ---------------------------------
     // Shader from renderer/Shader
     private Shader defaultShader;
+    private Texture testTexture;
     // id's needed to send objects from above arrays to GPU:
     private int vaoID, vboID, eboID;
     /* position, color, */
     private float[] vertexArray = {
-        // position             // color
-         100.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f, 1.0f, // bottom right | index --> 0
-        -0.5f,  100.5f, 0.0f,     0.0f, 1.0f, 0.0f, 1.0f, // top left     | index --> 1
-         100.5f,  100.5f, 0.0f,     0.0f, 0.0f, 1.0f, 1.0f, // top right    | index --> 2
-        -0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 0.0f, 1.0f, // bottom left  | index --> 3
+        // position             // color                    // UV Coordinates
+         100f, -0f, 0.0f,     1.0f, 0.0f, 0.0f, 1.0f,       1, 1,   // bottom right | index --> 0
+         0f,  100f, 0.0f,     0.0f, 1.0f, 0.0f, 1.0f,       0, 0,   // top left     | index --> 1
+         100f,100f, 0.0f,     1.0f, 0.0f, 1.0f, 1.0f,       1, 0,   // top right    | index --> 2
+         0f,    0f, 0.0f,     1.0f, 1.0f, 0.0f, 1.0f,       0, 1,   // bottom left  | index --> 3
     };
     /* list of elements to be displayed
     *  GOES in COUNTER-CLOCKWISE order.
@@ -67,6 +69,11 @@ public class LevelEditorScene extends Scene {
         * */
         defaultShader.compile();
 
+        /*
+        * Uploading texture to the GPU
+        * */
+        this.testTexture = new Texture("assets/Images/mario.png");
+        
         /* ---------------------------------------------------------------------------------
         *  GENERATE VAO, VBO, EBO buffer objects, and send them to GPU
         * */
@@ -99,17 +106,28 @@ public class LevelEditorScene extends Scene {
         // add the vertex attribute pointers, which explains that 3 first elements are coords and other 4 are colors
         int positionsSize = 3;
         int colorSize = 4;
-        int floatSizeBytes = 4; // we explain that every elements are floats, and size of a flaot is 4 bytes
-        int vertexSizeBytes = (positionsSize + colorSize) * floatSizeBytes;
+        int uvSize = 2;
+        int vertexSizeBytes = (positionsSize + colorSize + uvSize) * Float.BYTES;
         // first index 0, is a position
         glVertexAttribPointer(0, positionsSize, GL_FLOAT, false, vertexSizeBytes, 0); // last value offset is 0 , because we are not going anywhere after this point
         glEnableVertexAttribArray(0);
 
         // first index 1, represents Colors now.
-        glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionsSize * floatSizeBytes);
+        glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionsSize * Float.BYTES);
         glEnableVertexAttribArray(1);
 
+        // enable attribute pointer for UV coortinates
+        glVertexAttribPointer(2, uvSize, GL_FLOAT, false, vertexSizeBytes, (positionsSize + colorSize) * Float.BYTES) ;
+
+        // enable attribute vertex array:
+        glEnableVertexAttribArray(2);
         //------------------------------------- End of GPU ------------------------------------------
+    }
+
+    private void moveCamera(float dt) {
+        // move camera a bit to the side one step at a time.
+        camera.position.y -= dt * 20.0f;
+        camera.position.x -= dt * 50.0f;
     }
 
     /*
@@ -117,12 +135,18 @@ public class LevelEditorScene extends Scene {
     * */
     @Override
     public void update(float dt) {
-        // move camera a bit to the side one step at a time. 
-        camera.position.x -= dt * 50.0f;
-        camera.position.y -= dt * 20.0f;
+        // this is where you can trigger moveCamera():
+        // moveCamera(dt);
 
         // bind shader program
         defaultShader.use();
+
+        /*
+        * Upload texture to shader:
+        * */
+        defaultShader.uploadTexture("TEX_SAMPLER", 0);
+        glActiveTexture(GL_TEXTURE0); // now activate slot 0
+        testTexture.bind(); // put texture zero into the slot
 
         // before we bind everything, we upload ..
         defaultShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
