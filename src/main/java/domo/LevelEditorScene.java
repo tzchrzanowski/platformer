@@ -1,11 +1,14 @@
 package domo;
 
+import components.FontRenderer;
+import components.SpriteRenderer;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import renderer.Shader;
 import renderer.Texture;
 import util.Time;
 
+import java.awt.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -42,6 +45,10 @@ public class LevelEditorScene extends Scene {
             0, 1, 3  // bottom left triangle
     };
 
+    //---------------------- definition of game objects:
+    GameObject testObj;
+    private boolean firstTime = false;
+
     // ---------------------------------- methods definitions : ------------------------------------
     public LevelEditorScene() {
     }
@@ -54,6 +61,14 @@ public class LevelEditorScene extends Scene {
     * */
     @Override
     public void init() {
+        //------- initiate game objects at the start of the scene----X
+        System.out.println("Creating test object...");
+        this.testObj = new GameObject("test obj name");
+        this.testObj.addComponent(new SpriteRenderer());
+        this.testObj.addComponent(new FontRenderer());
+        this.addGameObjectToScene(this.testObj);
+        //------------------------------------------------------------X
+
         /*
         * Create new camera:
         * */
@@ -168,5 +183,20 @@ public class LevelEditorScene extends Scene {
                                        
         glBindVertexArray(0);
         defaultShader.detach();
+
+
+        //------- operations on game objects:
+        if (!firstTime) {
+            System.out.println("Creating game object!");
+            GameObject go = new GameObject("Game test 2 object");
+            go.addComponent(new SpriteRenderer());
+            this.addGameObjectToScene(go);
+            firstTime = true;
+         }
+
+        for (GameObject go : this.gameObjects) {
+            go.update(dt);
+        }
+
     }
 }
