@@ -71,8 +71,11 @@ public class LevelEditorScene extends Scene {
 
         /*
         * Create new camera:
+        * Initially camera is moved to the town left, so that first element rendered appears to be at the middle left side of the screen
         * */
         this.camera = new Camera(new Vector2f());
+        camera.position.y -= 200.0f;
+        camera.position.x -= 200.0f;
 
         /*
         * Get shader first from file
