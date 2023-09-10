@@ -75,6 +75,10 @@ public class Window {
         return Window.window;
     }
 
+    public static Scene getScene() {
+        return get().currentScene;
+    }
+
     public void run() {
         System.out.println("Konichiwa! LWJGL version: " + Version.getVersion() + "!" + " GL version: " + GLFW_VERSION_MAJOR + GLFW_VERSION_MINOR + GLFW_VERSION_REVISION );
         init();
