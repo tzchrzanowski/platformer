@@ -5,6 +5,9 @@ import org.joml.Vector2f;
 import org.joml.Vector4f;
 import util.AssetPool;
 
+import static org.lwjgl.opengl.GL11.glGetIntegerv;
+import static org.lwjgl.opengl.GL20.GL_MAX_TEXTURE_IMAGE_UNITS;
+
 public class LevelEditorScene extends Scene {
     public LevelEditorScene() {
     }
@@ -17,26 +20,19 @@ public class LevelEditorScene extends Scene {
     * */
     @Override
     public void init() {
-        this.camera = new Camera(new Vector2f());
-        int xOffset = 10;
-        int yOffset = 10;
-        // total width of square:
-        float totalWidth = (float)(600 - xOffset * 2);
-        float totalHeight = (float)(300 - xOffset * 2);
-        float sizeX = totalWidth / 100.0f;
-        float sizeY = totalHeight / 100.0f;
+        this.camera = new Camera(new Vector2f(-250, 0));
 
-        // creating 10 000 objects for test:
-        for (int x=0; x < 100; x++) {
-            for (int y=0; y<100; y++) {
-                float xPos = xOffset + (x * sizeX);
-                float yPos = yOffset + (y * sizeY);
+        /*
+        * add objects to scene, mario and gumbas textures:
+        * */
+        GameObject obj1 = new GameObject("Mario obj", new Transform(new Vector2f(100, 100), new Vector2f(256, 256)));
+        obj1.addComponent(new SpriteRenderer(AssetPool.getTexture("assets/images/mario.png")));
+        this.addGameObjectToScene(obj1);
 
-                GameObject go = new GameObject("Obje" + x + "" + y, new Transform(new Vector2f(xPos, yPos), new Vector2f(sizeX, sizeY)));
-                go.addComponent(new SpriteRenderer(new Vector4f(xPos / totalWidth, yPos / totalHeight, 1 , 1)));
-                this.addGameObjectToScene(go);
-            }
-        }
+        GameObject obj2 = new GameObject("Gumbas obj", new Transform(new Vector2f(400, 100), new Vector2f(256, 256)));
+        obj2.addComponent(new SpriteRenderer(AssetPool.getTexture("assets/images/gumbas.png")));
+        this.addGameObjectToScene(obj2);
+        // -----------------------------------------------------------
 
         // getting resources:
         loadResources();

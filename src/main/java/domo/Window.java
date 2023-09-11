@@ -4,7 +4,6 @@ import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
-import util.Time;
 
 import java.nio.*;
 import static org.lwjgl.glfw.Callbacks.*;
@@ -166,7 +165,7 @@ public class Window {
 
     public void loop () {
         // time when frame started
-        float beginTime = Time.getTime();
+        float beginTime = (float)glfwGetTime();
         // time when frame ended
         float endTime; // = Time.getTime();
         float dt = -1.0f;
@@ -191,7 +190,7 @@ public class Window {
              * dt is delta time of that time passed
              * beginTime is current time after operation is finished.
              */
-            endTime = Time.getTime();
+            endTime = (float)glfwGetTime();
             dt = endTime - beginTime;
             beginTime = endTime;
         }
