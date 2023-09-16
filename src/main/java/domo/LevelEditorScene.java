@@ -2,6 +2,7 @@ package domo;
 
 import components.Sprite;
 import components.SpriteRenderer;
+import components.SpriteSheet;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 import util.AssetPool;
@@ -21,26 +22,31 @@ public class LevelEditorScene extends Scene {
     * */
     @Override
     public void init() {
+        // getting resources:
+        loadResources();
+
+        // set up camera position:
         this.camera = new Camera(new Vector2f(-250, 0));
 
+        SpriteSheet sprites = AssetPool.getSpriteSheet("assets/Images/spritesheet.png");
         /*
         * add objects to scene, mario and gumbas textures:
         * */
         GameObject obj1 = new GameObject("Mario obj", new Transform(new Vector2f(100, 100), new Vector2f(256, 256)));
-        obj1.addComponent(new SpriteRenderer(new Sprite(AssetPool.getTexture("assets/images/mario.png"))));
+        obj1.addComponent(new SpriteRenderer(sprites.getSprite(0)));
         this.addGameObjectToScene(obj1);
 
         GameObject obj2 = new GameObject("Gumbas obj", new Transform(new Vector2f(400, 100), new Vector2f(256, 256)));
-        obj2.addComponent(new SpriteRenderer(new Sprite(AssetPool.getTexture("assets/images/gumbas.png"))));
+        obj2.addComponent(new SpriteRenderer(sprites.getSprite(10)));
         this.addGameObjectToScene(obj2);
         // -----------------------------------------------------------
-
-        // getting resources:
-        loadResources();
     }
 
     private void loadResources() {
         AssetPool.getShader("assets/shaders/default.glsl");
+
+        AssetPool.addSpriteSheet("assets/Images/spritesheet.png",
+                new SpriteSheet(AssetPool.getTexture("assets/Images/spritesheet.png"), 16, 16, 26, 0));
     }
 
 
