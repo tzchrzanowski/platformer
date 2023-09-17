@@ -11,6 +11,10 @@ import static org.lwjgl.opengl.GL11.glGetIntegerv;
 import static org.lwjgl.opengl.GL20.GL_MAX_TEXTURE_IMAGE_UNITS;
 
 public class LevelEditorScene extends Scene {
+
+    private GameObject obj1;
+    private SpriteSheet sprites;
+
     public LevelEditorScene() {
     }
 
@@ -28,11 +32,11 @@ public class LevelEditorScene extends Scene {
         // set up camera position:
         this.camera = new Camera(new Vector2f(-250, 0));
 
-        SpriteSheet sprites = AssetPool.getSpriteSheet("assets/Images/spritesheet.png");
+        this.sprites = AssetPool.getSpriteSheet("assets/Images/spritesheet.png");
         /*
         * add objects to scene, mario and gumbas textures:
         * */
-        GameObject obj1 = new GameObject("Mario obj", new Transform(new Vector2f(100, 100), new Vector2f(256, 256)));
+        obj1 = new GameObject("Mario obj", new Transform(new Vector2f(100, 100), new Vector2f(256, 256)));
         obj1.addComponent(new SpriteRenderer(sprites.getSprite(0)));
         this.addGameObjectToScene(obj1);
 
@@ -49,19 +53,38 @@ public class LevelEditorScene extends Scene {
                 new SpriteSheet(AssetPool.getTexture("assets/Images/spritesheet.png"), 16, 16, 26, 0));
     }
 
-
+    private int spriteIndex = 0;
+    private float spriteFLipTime = 0.2f;
+    private float spriteFlipTimeLeft = 0.0f;
     /*
     * Starts to use the Shader, and then unbinds it from memory.
     * */
     @Override
     public void update(float dt) {
-        // this is where you can trigger moveCamera():
+        /*
+        * this is where you can trigger moveCamera():
+        * *
         // moveCamera(dt);
 
-        // log FPS:
-        System.out.println("FPS: " + (1.0f / dt));
+        /*
+         * log FPS:
+         */
+        // System.out.println("FPS: " + (1.0f / dt));
 
-        for (GameObject go : this.gameObjects) {
+        /*
+        * change animation of single texture:
+        * */
+        spriteFlipTimeLeft -= dt;
+        if(spriteFlipTimeLeft <= 0) {
+            spriteFlipTimeLeft = spriteFLipTime;
+            spriteIndex++;
+            if (spriteIndex > 4) {
+                spriteIndex = 0;
+            }
+            obj1.getComponent(SpriteRenderer.class).setSprite(sprites.getSprite(spriteIndex ));
+        }
+
+        for ( GameObject go : this.gameObjects) {
             go.update(dt);
         }
         this.renderer.render();
