@@ -4,6 +4,8 @@ import components.SpriteRenderer;
 import domo.GameObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /*
@@ -31,7 +33,7 @@ public class Renderer {
     public void add(SpriteRenderer spr) {
         boolean added = false;
         for (RenderBatch batch : batches) {
-            if (batch.hasRoom()) {
+            if (batch.hasRoom() && batch.zIndex() == spr.gameObject.zIndex()) {
                 Texture tex = spr.getTexture();
                 if (tex != null && (batch.hasTexture(tex) || batch.hasTextureRoom())) {
                     batch.addSprite(spr);
@@ -42,10 +44,13 @@ public class Renderer {
         }
 
         if(!added) {
-            RenderBatch newBatch = new RenderBatch(MAX_BATCH_SIZE);
+            RenderBatch newBatch = new RenderBatch(MAX_BATCH_SIZE, spr.gameObject.zIndex());
             newBatch.start();
             batches.add(newBatch);
             newBatch.addSprite(spr);
+            Collections.sort(batches); // sort batches so that z-indexes are not messed up
+//            Collections.sort(batches, Collections.reverseOrder()); // sort batches in reverse-order
+
         }
     }
 

@@ -36,13 +36,20 @@ public class LevelEditorScene extends Scene {
         /*
         * add objects to scene, mario and gumbas textures:
         * */
-        obj1 = new GameObject("Mario obj", new Transform(new Vector2f(100, 100), new Vector2f(256, 256)));
-        obj1.addComponent(new SpriteRenderer(sprites.getSprite(0)));
+        obj1 = new GameObject("Mario obj- left", new Transform(new Vector2f(200, 100), new Vector2f(256, 256)), 0);
+//        obj1.addComponent(new SpriteRenderer(sprites.getSprite(0)));
+        obj1.addComponent(new SpriteRenderer(new Sprite(
+                AssetPool.getTexture("assets/Images/blendImage1.png")
+        )));
         this.addGameObjectToScene(obj1);
 
-        GameObject obj2 = new GameObject("Gumbas obj", new Transform(new Vector2f(400, 100), new Vector2f(256, 256)));
-        obj2.addComponent(new SpriteRenderer(sprites.getSprite(10)));
+        GameObject obj2 = new GameObject("Gumbas obj - right", new Transform(new Vector2f(400, 100), new Vector2f(256, 256)), -1);
+//        obj2.addComponent(new SpriteRenderer(sprites.getSprite(10)));
+        obj2.addComponent(new SpriteRenderer(new Sprite(
+                AssetPool.getTexture("assets/Images/blendImage2.png")
+        )));
         this.addGameObjectToScene(obj2);
+
         // -----------------------------------------------------------
     }
 
@@ -74,15 +81,15 @@ public class LevelEditorScene extends Scene {
         /*
         * change animation of single texture:
         * */
-        spriteFlipTimeLeft -= dt;
-        if(spriteFlipTimeLeft <= 0) {
-            spriteFlipTimeLeft = spriteFLipTime;
-            spriteIndex++;
-            if (spriteIndex > 4) {
-                spriteIndex = 0;
-            }
-            obj1.getComponent(SpriteRenderer.class).setSprite(sprites.getSprite(spriteIndex ));
-        }
+//        spriteFlipTimeLeft -= dt;
+//        if(spriteFlipTimeLeft <= 0) {
+//            spriteFlipTimeLeft = spriteFLipTime;
+//            spriteIndex++;
+//            if (spriteIndex > 4) {
+//                spriteIndex = 0;
+//            }
+//            obj1.getComponent(SpriteRenderer.class).setSprite(sprites.getSprite(spriteIndex ));
+//        }
 
         for ( GameObject go : this.gameObjects) {
             go.update(dt);
