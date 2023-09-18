@@ -160,6 +160,18 @@ public class Window {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
+        /*
+        * after enabling GL capabilities.
+        * then we allow blending:
+        * gl one - gl minus alpha is most common one to use
+        * */
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+
+        /*
+        * changing currently used scene.
+        * */
         Window.changeScene(0);
     }
 
